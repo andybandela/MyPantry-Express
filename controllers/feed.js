@@ -1,7 +1,8 @@
 const recipes = require('../data')
 
 exports.getRecipes = (req,res,next) => {
-    res.json({
+    res.status(200).json({
         recipes : recipes.recipes
     })
+    console.log('Sent')
 };

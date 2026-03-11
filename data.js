@@ -73,6 +73,64 @@ const recipes = [
     }
 ];
 
+const categories = {
+    main: [
+        {
+            category: "Meat & Poultry",
+            recipes: [0,1,2,3,4,8],
+            param: "/category?name=meat_and_poultry&_id=0&cat=main",
+            imageUrl: "http://localhost:8080/images/meat.png"
+        },
+        {
+            category: "Fish & Crustacean",
+            recipes: [7],
+            param: "/category?name=fish_and_crustacean&_id=1&cat=main",
+            imageUrl: "http://localhost:8080/images/fish.png"
+        },
+        {
+            category: "Vegetarian",
+            recipes: [5,6],
+            param: "/category?name=vegeterian&_id=2&cat=main",
+            imageUrl: "http://localhost:8080/images/vege.png"
+        },
+        {
+            category: "Dessert",
+            recipes: [],
+            param: "/category?name=dessert&_id=3&cat=main",
+            imageUrl: "http://localhost:8080/images/dessert.png"
+        },
+        {
+            category: "Baking",
+            recipes: [],
+            param: "/category?name=baking&_id=4&cat=main",
+            imageUrl: "http://localhost:8080/images/baking.png"
+        }
+    ],
+    sub : [
+        {
+            category: "French",
+            recipes: [7],
+            param: "/category?name=french&_id=0&cat=sub"
+        },
+        {
+            category: "Chinese",
+            recipes: [0,2,8],
+            param: "/category?name=chinese&_id=1&cat=sub"
+        },
+        {
+            category: "Italian",
+            recipes: [1,4],
+            param: "/category?name=italian&_id=2&cat=sub"
+        },
+        {
+            category: "Congolose",
+            recipes: [3,5,6],
+            param: "/category?name=congolese&_id=3&cat=sub"
+        }
+    ]
+}
+
+
 const Chicken_recipe_data = {
     recipe_name: 'Carbonara Pasta',
     recipe_instructions: '',
@@ -571,5 +629,6 @@ module.exports = {
     recipes,
     Chicken_recipe_data,
     Pork_recipe_data,
-    recipe_content
+    recipe_content,
+    categories
 }

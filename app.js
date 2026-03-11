@@ -1,7 +1,8 @@
 const express = require('express');
 const feedRoutes = require('./routes/feed');
-const recipeRoutes = require('./routes/recipe')
-const path = require('path')
+const recipeRoutes = require('./routes/recipe');
+const categoryRoutes = require('./routes/category')
+const path = require('path');
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use('/images', express.static(path.join(__dirname,'images')));
 
 app.use('/feed',feedRoutes);
 app.use('/recipe',recipeRoutes);
+app.use('/category',categoryRoutes);
 
 
 app.listen(8080);

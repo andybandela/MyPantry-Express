@@ -20,7 +20,7 @@ exports.addRecipe = (req, res, next) => {
     }
 };
 
-exports.createRecipe = async (req, res) => {
+exports.createRecipe = async (req, res,next) => {
     try {
         const { title, description, ingredients, instructions, metaInfo, userId } = req.body;
         if (!title || !ingredients || !instructions|| !userId) {
@@ -70,3 +70,32 @@ exports.createRecipe = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+
+exports.getAllRecipes = async (req, res, next) => {
+    try {
+        const recipes = await Recipe.find().populate('ingredients.ingredient', 'name -_id').select('-_id title description instructions metaInfo ingredients.quantity ingredients.unit ingredients.ingredient');
+        if (!recipes) {
+            return res.status(404).json({ message: "No recipes found" });
+        }
+        res.status(200).json({ recipes });
+    } catch (error) {
+        console.error("Error fetching recipes:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+}
+
+exports.getRecipe = async (req, res, next) => {
+    try {
+        const title = req.params.title;
+        const titlere =  title.split(' ').map(word => `(?=.*${word})`).join('');
+        const regex = new RegExp(titlere, 'i');
+        const recipe = await Recipe.find({ title: {$regex: regex} }).populate('ingredients.ingredient', 'name -_id').select('-_id title description instructions metaInfo ingredients.quantity ingredients.unit ingredients.ingredient');
+        if (!recipe) {
+            return res.status(404).json({ message: "Recipe not found" });
+        }
+        res.status(200).json({ recipe });
+    } catch (error) {
+        console.error("Error fetching recipe:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+}

@@ -1,4 +1,5 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
+const User = require('./user');
 const Ingredient = require("./ingredient");
 
 const pantryItemSchema = new mongoose.Schema(
@@ -18,4 +19,10 @@ const pantryItemSchema = new mongoose.Schema(
     }
   }
 );
-module.exports = mongoose.model("PantryItem", pantryItemSchema);
+
+const pantrySchema = new mongoose.Schema({
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    items: [pantryItemSchema]
+}, { timestamps: true });
+
+module.exports = mongoose.model('Pantry', pantrySchema);

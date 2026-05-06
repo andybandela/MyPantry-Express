@@ -3,6 +3,7 @@ const feedRoutes = require("./routes/feed");
 const recipeRoutes = require("./routes/recipe");
 const categoryRoutes = require("./routes/category");
 const userRoutes = require("./routes/user");
+const PantryRoutes = require("./routes/pantry");
 const path = require("path");
 const mongoose = require("mongoose");
 const { log } = require("console");
@@ -27,6 +28,7 @@ app.use("/user", userRoutes);
 app.use("/feed", feedRoutes);
 app.use("/recipe", recipeRoutes);
 app.use("/category", categoryRoutes);
+app.use("/pantry", PantryRoutes);
 
 const main = async () => {
   try {

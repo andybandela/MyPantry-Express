@@ -29,10 +29,15 @@ exports.addPantryItem = async (req, res) => {
 
 exports.getPantryItems = async (req, res) => {
     try {
-        const userId = req.params.userId;
-        const pantryItems = await User.findById(userId).populate({'pantry': { path: 'pantry', populate: { path: 'ingredient', select: 'name' } } }).select('pantry');
-        //const pantryItems = await PantryItem.find({ user: userId }).populate('ingredient', 'name');
-        res.status(200).json({ pantryItems });
+        const userId = req.query.userID;
+        if (!userId) {
+            return res.status(400).json({ message: "User ID is required" });
+        }
+        const pantry = await Pantry.findOne({ user: userId }).populate('items.ingredient', 'name');
+        if (!pantry) {
+            return res.status(404).json({ message: "Pantry not found for this user" });
+        }
+        res.status(200).json({ pantryItems: pantry.items });
     } catch (error) {
         console.error("Error fetching pantry items:", error);
         res.status(500).json({ message: "Server error" });
@@ -100,3 +105,84 @@ exports.addItem = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+
+exports.increaseQuantity = async (req, res) => {
+    try {
+        const {userId, ingredientId, amount} = req.body;
+        if (!userId || !ingredientId) {
+            return res.status(400).json({ message: "User ID, and Ingredient ID are required" });
+        }
+        if (!amount){
+            await Pantry.findOneAndUpdate(
+                { user: userId, "items.ingredient": ingredientId },
+                { $inc: { "items.$.quantity": 1 } }
+            );
+            
+        } else {
+            await Pantry.findOneAndUpdate(
+                { user: userId, "items.ingredient": ingredientId },
+                { $inc: { "items.$.quantity": amount } }
+            );
+        }
+        res.status(200).json({ message: "Pantry item quantity increased successfully" });
+    } catch (error) {
+        console.error("Error increasing pantry item quantity:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+}
+
+exports.decreaseQuantity = async (req, res) => {
+    try {
+        const {userId, ingredientId, amount} = req.body;
+        if (!userId || !ingredientId) {
+            return res.status(400).json({ message: "User ID, and Ingredient ID are required" });
+        }
+        if (!amount){
+            await Pantry.findOneAndUpdate(
+                { user: userId, "items.ingredient": ingredientId },
+                { $inc: { "items.$.quantity": -1 } }
+            );
+            
+        } else {
+            const pantry = await Pantry.findOne({ user: userId, "items.ingredient": ingredientId });
+            const item = pantry.items.find(item => item.ingredient.toString() === ingredientId.toString());
+            if (item){
+                let qty = item.quantity;
+                if (amount > qty){
+                    return res.status(400).json({ message: "Amount to decrease exceeds current quantity" });
+                }
+            }
+            
+            await Pantry.findOneAndUpdate(
+                { user: userId, "items.ingredient": ingredientId },
+                { $inc: { "items.$.quantity": -amount } }
+            );
+        }
+        res.status(200).json({ message: "Pantry item quantity decreased successfully" });
+    } catch (error) {
+        console.error("Error decreasing pantry item quantity:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+}
+
+exports.deletePantryItem = async (req, res) => {
+    try {
+        
+        const userId = req.query.userId;
+        const ingredientId = req.query.ingredientId;
+        if (!userId || !ingredientId) {
+            return res.status(400).json({ message: "User ID, and Ingredient ID are required" });
+        }
+        const pantry = await Pantry.findOne({ user: userId });
+        if (!pantry) {
+            return res.status(404).json({ message: "Pantry not found for this user" });
+        } else {
+            pantry.items.pull({ ingredient: ingredientId });
+            await pantry.save();
+            res.status(200).json({ message: "Pantry item deleted successfully" });
+        }
+    } catch (error) {
+        console.error("Error deleting pantry item:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+}
